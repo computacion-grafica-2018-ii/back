@@ -23,7 +23,7 @@ ENV PORT=80
 ADD Gemfile /api_gateway/Gemfile
 ADD Gemfile.lock /api_gateway/Gemfile.lock
 
-RUN bundle install --without development test
+RUN bundle install
 
 COPY . .
 
