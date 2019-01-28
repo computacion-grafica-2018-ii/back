@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+  app:
+    networks:
+      - backend
+    depends_on:
+      - 'db'
+    build: '.'
+    volumes:
+      - .:/api_gateway
+    ports:
+      - 80:80
+  db:
+    image: 'postgres:9.6-alpine'
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: 'computacion'
+      POSTGRES_PASSWORD: 'graphicscomputation2019'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+volumes:
+  postgres_data:
+networks:
+  backend:
