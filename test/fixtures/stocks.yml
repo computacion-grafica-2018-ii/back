@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  supplier: MyString
+  delivery_delay: 1
+  name: MyString
+  code: MyString
+  quantity: 1
+  price: 1
+
+two:
+  supplier: MyString
+  delivery_delay: 1
+  name: MyString
+  code: MyString
+  quantity: 1
+  price: 1
