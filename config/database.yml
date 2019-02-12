@@ -18,7 +18,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   #host: 35.224.152.151
-  host: db
+  host: localhost
   prepared_statements: false
   pool: 25
   username: computacion

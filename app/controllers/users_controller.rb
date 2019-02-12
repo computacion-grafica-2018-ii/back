@@ -1,16 +1,33 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :update, :destroy]
+  #before_action :set_user, only: [:show, :update, :destroy]
 
   # GET /users
   def index
     @users = User.all
-
-    render json: @users
+    respond_to do |format|
+      format.json { render :json => @users }
+      format.csv { send_data @users.to_csv }
+      #format.csv { render text: @users.to_csv }
+      format.xls { send_data @users.to_csv(col_sep: "\t")  }
+    end
+    #render json: @users
   end
 
   # GET /users/1
   def show
-    render json: @user
+      @user = User.find(params[:id])
+      render json: @user
+  end
+
+  def export
+
+      @user = User.where(id: params[:id])
+      respond_to do |format|
+        format.json { render :json => @user }
+        format.csv { send_data @user.to_csv }
+        format.xls { send_data @user.to_csv(col_sep: "\t")  }
+      end
+
   end
 
   # POST /users
