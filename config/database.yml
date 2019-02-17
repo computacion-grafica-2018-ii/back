@@ -17,12 +17,15 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  #host: 35.224.152.151
   host: localhost
+  #host: 35.224.152.151
+  #host: 104.154.131.75
   prepared_statements: false
   pool: 25
-  username: computacion
-  password: graphicscomputation2019
+  #username: computacion
+  username: postgres
+  #password: graphicscomputation2019
+  password: 1234
   # For details on connection pooling, see Rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>

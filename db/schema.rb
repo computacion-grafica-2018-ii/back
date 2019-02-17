@@ -17,8 +17,10 @@ ActiveRecord::Schema.define(version: 2019_01_30_151736) do
 
   create_table "products", force: :cascade do |t|
     t.string "name"
-    t.json "property"
-    t.string "excelPath"
+    t.json "properties"
+    t.string "assemblyPath"
+    t.string "assemblyFile"
+    t.string "excelFile"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -26,6 +28,7 @@ ActiveRecord::Schema.define(version: 2019_01_30_151736) do
   create_table "quotation_products", force: :cascade do |t|
     t.bigint "product_id"
     t.bigint "quotation_id"
+    t.json "specs"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_quotation_products_on_product_id"
@@ -34,6 +37,7 @@ ActiveRecord::Schema.define(version: 2019_01_30_151736) do
 
   create_table "quotations", force: :cascade do |t|
     t.bigint "user_id"
+    t.integer "quantity"
     t.datetime "delivery_date"
     t.integer "price"
     t.string "image_path"
