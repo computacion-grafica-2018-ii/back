@@ -7,6 +7,7 @@ ruby '2.5.3'
 gem 'rails', '~> 5.2.1'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
+gem 'wdm', '>= 0.1.0' if Gem.win_platform?
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -15,6 +16,8 @@ gem 'puma', '~> 3.11'
 # gem 'redis', '~> 4.0'
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1.7'
+#Excel files in rails
+gem 'writeexcel'
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'

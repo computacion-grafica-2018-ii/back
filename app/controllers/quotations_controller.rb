@@ -1,5 +1,6 @@
 class QuotationsController < ApplicationController
   before_action :set_quotation, only: [:show, :update, :destroy]
+  require 'writeexcel'
 
   # GET /quotations
   def index
@@ -15,13 +16,66 @@ class QuotationsController < ApplicationController
 
   # POST /quotations
   def create
-    @quotation = Quotation.new(quotation_params)
+    params = quotation_params
+    product = Product.find( params[ :product_id ] )
+    productProperties = JSON.parse product.properties
+    specifications = params[ :specifications ]
+
+    @quotation = Quotation.new( )
+    @quotation.user_id = params[ :user_id ] 
+    @quotation.quantity = params[ :quantity ] 
+    @quotation.delivery_date = Time.now + (2*7*24*60*60) #two weeks
+    @quotation.status = 0
+    @quotation.save
+
+    @quotationProduct = QuotationProduct.new( )
+    @quotationProduct.product_id = params[ :product_id ]
+    @quotationProduct.quotation_id = @quotation.id
+    @quotationProduct.specs = specifications
+    @quotationProduct.save
+
+    assemblyFilePath = product.assemblyPath + "/" + product.assemblyFile
+
+    #Write excel
+    row, col = 0, 0
+    workbook = WriteExcel.new( product.assemblyPath + "/" + "coso.xls" )
+    worksheet  = workbook.add_worksheet
+    productProperties[ 'columns' ].each do |label|
+      worksheet.write( row, col, label )
+      col += 1
+    end
+    col = 0
+    row += 1
+    productProperties[ 'params' ].each do |parameter|
+      worksheet.write( row, col, parameter['name'] )
+      worksheet.write( row, col + 1, specifications[parameter['name'] ] )
+      worksheet.write( row, col + 2, parameter['units'] )
+      row += 1
+    end
+    workbook.close
 
     if @quotation.save
-      render json: @quotation, status: :created, location: @quotation
+      if @quotationProduct.save
+        render json: "Cotización creada exitosamente", status: :created
+      else
+        render json: @quotationProduct.errors, status: :unprocessable_entity
+      end
     else
       render json: @quotation.errors, status: :unprocessable_entity
     end
+
+    #Call Inventor
+    puts "Creating system call to Inventor"
+    t = Thread.new {
+      inventorExe = File.join("C:", "Program Files", "Autodesk", "Inventor 2019", "Bin", "Inventor.exe")
+      puts "Process spawned"
+      pid = spawn "#{inventorExe}", "#{assemblyFilePath}"
+      while !File.exists? product.assemblyPath + "/stop.txt" do
+        # w8 for process execution
+      end
+      Process.kill( "KILL", pid )
+      puts "Process killed successfully"
+    }
   end
 
   # PATCH/PUT /quotations/1
@@ -46,6 +100,6 @@ class QuotationsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def quotation_params
-      params.require(:quotation).permit(:user_id, :delivery_date, :price, :image_path, :document_path, :status)
+      params.require(:quotation)
     end
 end
