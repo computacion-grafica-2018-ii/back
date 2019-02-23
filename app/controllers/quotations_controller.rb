@@ -18,7 +18,7 @@ class QuotationsController < ApplicationController
   def create
     params = quotation_params
     product = Product.find( params[ :product_id ] )
-    productProperties = JSON.parse product.properties
+    productProperties = JSON.parse product.properties.to_json
     specifications = params[ :specifications ]
 
     @quotation = Quotation.new( )
@@ -38,7 +38,7 @@ class QuotationsController < ApplicationController
 
     #Write excel
     row, col = 0, 0
-    workbook = WriteExcel.new( product.assemblyPath + "/" + "coso.xls" )
+    workbook = WriteExcel.new( product.assemblyPath + "/" + product.excelFile )
     worksheet  = workbook.add_worksheet
     productProperties[ 'columns' ].each do |label|
       worksheet.write( row, col, label )
@@ -56,7 +56,7 @@ class QuotationsController < ApplicationController
 
     if @quotation.save
       if @quotationProduct.save
-        render json: "Cotización creada exitosamente", status: :created
+        render json: { :success => "Cotización creada exitosamente"}, status: :created
       else
         render json: @quotationProduct.errors, status: :unprocessable_entity
       end
@@ -69,8 +69,9 @@ class QuotationsController < ApplicationController
     t = Thread.new {
       inventorExe = File.join("C:", "Program Files", "Autodesk", "Inventor 2019", "Bin", "Inventor.exe")
       puts "Process spawned"
+      p specifications['cotizacion']
       pid = spawn "#{inventorExe}", "#{assemblyFilePath}"
-      while !File.exists? product.assemblyPath + "/stop.txt" do
+      while !File.exists? product.assemblyPath + "/cotizacion" + (specifications['cotizacion']).to_s + "/stop.txt" do
         # w8 for process execution
       end
       Process.kill( "KILL", pid )
