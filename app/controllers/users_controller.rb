@@ -21,7 +21,8 @@ class UsersController < ApplicationController
 
   def export
 
-      @user = User.where(id: params[:id])
+      #@user = User.where(id: params[:id])
+      @user = User.joins(:quotations)		
       respond_to do |format|
         format.json { render :json => @user }
         format.csv { send_data @user.to_csv }
