@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   has_secure_password
 
+  has_many :quotations
+
   def self.to_csv(options = {})
     CSV.generate(options) do |csv|
       csv << column_names
