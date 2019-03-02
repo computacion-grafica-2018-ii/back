@@ -18,7 +18,7 @@ class QuotationsController < ApplicationController
   def create
     params = quotation_params
     product = Product.find( params[ :product_id ] )
-    productProperties = JSON.parse product.properties.to_json
+    productProperties = JSON.parse product.properties
     specifications = params[ :specifications ]
 
     @quotation = Quotation.new( )
@@ -46,12 +46,19 @@ class QuotationsController < ApplicationController
     end
     col = 0
     row += 1
-    productProperties[ 'params' ].each do |parameter|
+    productProperties[ 'params' ].each do |parameter|      
       worksheet.write( row, col, parameter['name'] )
-      worksheet.write( row, col + 1, specifications[parameter['name'] ] )
+      if( parameter['formula'] != '' )
+        worksheet.write( row, col + 1, Stock.where(code: parameter['formula']).first.price )
+      else
+        worksheet.write( row, col + 1, specifications[parameter['name']])
+      end      
       worksheet.write( row, col + 2, parameter['units'] )
       row += 1
     end
+    worksheet.write( row, 0, 'cotizacion' )
+    worksheet.write( row, 1,  @quotation.id )
+    worksheet.write( row, 2, 'ul' )
     workbook.close
 
     if @quotation.save
@@ -69,9 +76,8 @@ class QuotationsController < ApplicationController
     t = Thread.new {
       inventorExe = File.join("C:", "Program Files", "Autodesk", "Inventor 2019", "Bin", "Inventor.exe")
       puts "Process spawned"
-      p specifications['cotizacion']
       pid = spawn "#{inventorExe}", "#{assemblyFilePath}"
-      while !File.exists? product.assemblyPath + "/cotizacion" + (specifications['cotizacion']).to_s + "/stop.txt" do
+      while !File.exists? product.assemblyPath + "/cotizacion/" + (@quotation.id).to_s + "/stop.txt" do
         # w8 for process execution
       end
       Process.kill( "KILL", pid )
