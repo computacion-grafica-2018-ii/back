@@ -18,6 +18,10 @@ gem 'puma', '~> 3.11'
 gem 'bcrypt', '~> 3.1.7'
 #Excel files in rails
 gem 'writeexcel'
+gem 'openssl'
+
+gem 'twilio-ruby', '~> 5.21.0'
+
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
